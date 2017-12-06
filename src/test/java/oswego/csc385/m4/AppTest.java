@@ -353,6 +353,7 @@ public class AppTest {
 
         /*
         Code is correct, expected results were wrongly calculated...
+        probably because of HashTable.get() returning -1 on unfound instead of 0
         */
     }
 
@@ -372,6 +373,83 @@ public class AppTest {
 
         /*
         Code is correct, expected results were wrongly calculated...
+        probably because of HashTable.get() returning -1 on unfound instead of 0
+        */
+    }
+
+    @Test
+    public void t18() {
+        String url1 = "http://threevirtues.com";
+        String url2 = "https://en.wikipedia.org/wiki/7";
+
+        String[] arr = p.makeWordArray(url1);
+        String[] arr2 = p.makeWordArray(url2);
+        ArrayList<String> arrl = p.makeMetaTagWords(url1);
+        ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+        p.populateTable(first, arr, false);
+        p.populateTable(second, arr2, false);
+        p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+        p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+        
+        double res = p.cosineVectorSimilarity(first, second);
+        
+        assertTrue(res > 0.056 && res < 0.058);
+        
+        /*
+        Passes :D
+        */
+    }
+
+    @Test
+    public void t19() {
+        String url1 = "http://threevirtues.com";
+        String url2 = "https://en.wikipedia.org/wiki/7";
+
+        ArrayList<String> arrl = p.makeMetaTagWords(url1);
+        ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+        String[] arr = p.makeWordArray(url1);
+        String[] arr2 = p.makeWordArray(url2);
+        
+        p.populateTable(first, arr, false);
+        p.populateTable(second, arr2, false);
+        p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+        p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+        
+        double res = p.cosineVectorSimilarity(first, second);
+        
+        assertTrue(res > 0.056 && res < 0.058);
+        
+        /*
+        Passes :D
+        */
+    }
+
+    @Test
+    public void t20() {
+        first.put("ejemplo", 1);
+        second.put("example", 1);
+
+        assertEquals(first.get("ejemplo"), 1);
+        assertEquals(second.get("example"), 1);
+
+        first.updateValue("ejemplo", first.get("ejemplo") + 1);
+        assertEquals(first.get("ejemplo"), 2);
+
+        HashSet<String> firstSet = first.getTableKeys();
+        HashSet<String> secondSet = second.getTableKeys();
+        assertEquals(firstSet.size(), 1);
+        assertEquals(secondSet.size(), 1);
+        assertTrue(firstSet.contains("ejemplo"));
+        assertTrue(secondSet.contains("example"));
+
+        double res = p.cosineVectorSimilarity(first, second);
+        assertEquals(res, 0.0, 1e-15);
+
+        /* 
+        Classes interact as expected, but final output is wrong
+        Problem is that HashTable.get() returns -1 if key not found in
+        HashSet, but it should return 0 for the purposes of the program.
         */
     }
 }
