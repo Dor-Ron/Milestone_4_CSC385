@@ -233,7 +233,7 @@ public class AppTest {
     //     String url2 = "https://en.wikipedia.org/wiki/4";
 
     //     for(long i = 0; i < Integer.MAX_VALUE; i++) 
-    //         second.put(String.join("", Collections.nCopies((int)i, "a")), 1);
+    //         second.put(String.join("", Collections.nCopies((int)i+7, "b")), 1);
 
     //     String[] arr2 = p.makeWordArray(url2);
     //     ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
@@ -452,4 +452,565 @@ public class AppTest {
         HashSet, but it should return 0 for the purposes of the program.
         */
     }
+
+    ////// Boundary Value Analysis
+
+    @Test
+    public void t21() {
+        String url1 = "https://github.com";
+        String url2 = "https://en.wikipedia.org/wiki/1";
+        String[] arr = p.makeWordArray(url1);
+        String[] arr2 = p.makeWordArray(url2);
+        ArrayList<String> arrl = p.makeMetaTagWords(url1);
+        ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+        p.populateTable(first, arr, false);
+        p.populateTable(second, arr2, false);
+        p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+        p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+
+        first.updateValue("github", first.get("github") - 1);
+        
+        double res = p.cosineVectorSimilarity(first, second);
+        
+        assertTrue(res > 0.257 && res < 0.357);
+        
+        /*
+        Failed because wikipedia page was updated
+        and expected value in document is no-longer accurate
+        */
+    }
+
+    @Test
+    public void t22() {
+        String url1 = "https://github.com";
+        String url2 = "https://en.wikipedia.org/wiki/1";
+        String[] arr = p.makeWordArray(url1);
+        String[] arr2 = p.makeWordArray(url2);
+        ArrayList<String> arrl = p.makeMetaTagWords(url1);
+        ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+        p.populateTable(first, arr, false);
+        p.populateTable(second, arr2, false);
+        p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+        p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+
+        first.updateValue("github", first.get("github") + 1);
+        
+        double res = p.cosineVectorSimilarity(first, second);
+        
+        assertTrue(res > 0.302 && res < 0.389);
+        
+        /*
+        Failed because wikipedia page was updated
+        and expected value in document is no-longer accurate
+        */
+    }
+
+    @Test
+    public void t23() {
+        first.put("example", 3);
+        second.put("ejemplo", 5);
+        
+        first.updateValue("example", first.get("example") - 1);
+
+        double res = p.cosineVectorSimilarity(first, second);
+        
+        assertEquals(0.0, 0.0, 1e-15);
+
+        /*
+        Passes :D
+        */
+    }
+
+    @Test
+    public void t24() {
+        first.put("example", 3);
+        second.put("ejemplo", 5);
+        
+        first.updateValue("example", first.get("example") + 1);
+
+        double res = p.cosineVectorSimilarity(first, second);
+        
+        assertEquals(0.0, 0.0, 1e-15);
+
+        /*
+        Passes :D
+        */
+    }
+
+    // TOO LONG TO EXECUTE, NOT WORTH TESTING!!!!!
+    // @Test
+    // public void t25() {
+    //     String url2 = "https://en.wikipedia.org/wiki/4";
+
+    //     for(long i = 0; i < Integer.MAX_VALUE; i++) 
+    //         first.put(String.join("", Collections.nCopies((int)i, "a")), 1);
+    
+    //     first.updateValue("aa", first.get("aa") - 1)
+    
+    //     String[] arr2 = p.makeWordArray(url2);
+    //     ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //     p.populateTable(second, arr2, false);
+    //     p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+
+    //     double res = p.cosineVectorSimilarity(first, second);
+    //     assertEquals(res, <SOME_OUTPUT>);
+    //     /*
+    //     Fails because comparing empty HashTable to populated one doesnt cause an error
+    //     */
+    // }
+
+    // TOO LONG TO EXECUTE, NOT WORTH TESTING!!!!!
+    // @Test
+    // public void t25() {
+    //     String url2 = "https://en.wikipedia.org/wiki/4";
+
+    //     for(long i = 0; i < Integer.MAX_VALUE; i++) 
+    //         first.put(String.join("", Collections.nCopies((int)i, "a")), 1);
+    
+    //     first.updateValue("aa", first.get("aa") + 1)
+    
+    //     String[] arr2 = p.makeWordArray(url2);
+    //     ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //     p.populateTable(second, arr2, false);
+    //     p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+
+    //     double res = p.cosineVectorSimilarity(first, second);
+    //     assertEquals(res, <SOME_OUTPUT>);
+    //     /*
+    //     Fails because comparing empty HashTable to populated one doesnt cause an error
+    //     */
+    // }
+
+    // @Test
+    // public void t26() {
+    //     first.put("negative", -9);
+    //     String url2 = "https://en.wikipedia.org/wiki/5";
+        
+    //      String[] arr2 = p.makeWordArray(url2);
+    //      ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //      first.updateValue("negative", first.get("negative") - 1);
+ 
+    //      p.populateTable(second, arr2, false);
+    //      p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+    // @Test
+    // public void t27() {
+    //     first.put("negative", -9);
+    //     String url2 = "https://en.wikipedia.org/wiki/5";
+        
+    //      String[] arr2 = p.makeWordArray(url2);
+    //      ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //      first.updateValue("negative", first.get("negative") + 1);
+ 
+    //      p.populateTable(second, arr2, false);
+    //      p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+    // LEADS TO COMPILATION ERROR: Test Passes!!!
+    // @Test
+    // public void t28() {
+    //     first.put("test", "one");
+    //     String url2 = "https://en.wikipedia.org/wiki/6";
+        
+    //      String[] arr2 = p.makeWordArray(url2);
+    //      ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //      first.updateValue("test", "ond");
+ 
+    //      p.populateTable(second, arr2, false);
+    //      p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+    // LEADS TO COMPILATION ERROR: Test Passes!!!
+    // @Test
+    // public void t29() {
+    //     first.put("test", "one");
+    //     String url2 = "https://en.wikipedia.org/wiki/6";
+        
+    //      String[] arr2 = p.makeWordArray(url2);
+    //      ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //      first.updateValue("test", "onf");
+ 
+    //      p.populateTable(second, arr2, false);
+    //      p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+    // LEADS TO COMPILATION ERROR: Test Passes!!!
+    // @Test
+    // public void t30() {
+    //     first.put("test1.2", 7.9);
+    //     String url2 = "https://en.wikipedia.org/wiki/6";
+        
+    //      String[] arr2 = p.makeWordArray(url2);
+    //      ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //      first.updateValue("test1.2", 7.89);
+ 
+    //      p.populateTable(second, arr2, false);
+    //      p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+    // LEADS TO COMPILATION ERROR: Test Passes!!!
+    // @Test
+    // public void t30() {
+    //     first.put("test1.2", 7.9);
+    //     String url2 = "https://en.wikipedia.org/wiki/6";
+        
+    //      String[] arr2 = p.makeWordArray(url2);
+    //      ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //      first.updateValue("test1.2", 7.91);
+ 
+    //      p.populateTable(second, arr2, false);
+    //      p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+    // LEADS TO COMPILATION ERROR: Test Passes!!!
+    @Test
+    public void t31() {
+        first.put(".......................", 1);
+        String url2 = "https://oswego.edu";
+        
+         String[] arr2 = p.makeWordArray(url2);
+         ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+ 
+         p.populateTable(second, arr2, false);
+         p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+         double res = p.cosineVectorSimilarity(first, second);
+         assertEquals(res, 0.0, 0.0);
+
+        /*
+        No error thrown, negative occurences permitted by program,
+        both specification followed by the corresponding code must
+        be updated accordingly.
+        */
+    }
+
+    @Test
+    public void t32() {
+        first.put(".......................", 1);
+        String url2 = "https://oswego.edu";
+        
+         String[] arr2 = p.makeWordArray(url2);
+         ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+ 
+        second.updateValue("oswego", second.get("oswego") - 1);
+
+         p.populateTable(second, arr2, false);
+         p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+         double res = p.cosineVectorSimilarity(first, second);
+         assertEquals(res, 0.0, 0.0);
+
+        /*
+        No error thrown, negative occurences permitted by program,
+        both specification followed by the corresponding code must
+        be updated accordingly.
+        */
+    }
+
+    @Test
+    public void t33() {
+        first.put(".......................", 1);
+        String url2 = "https://oswego.edu";
+        
+         String[] arr2 = p.makeWordArray(url2);
+         ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+         second.updateValue("oswego", second.get("oswego") + 1);         
+ 
+         p.populateTable(second, arr2, false);
+         p.populateTable(second, arrl2.toArray(new String[arrl2.size()]), true);
+ 
+         double res = p.cosineVectorSimilarity(first, second);
+         assertEquals(res, 0.0, 0.0);
+
+        /*
+        No error thrown, negative occurences permitted by program,
+        both specification followed by the corresponding code must
+        be updated accordingly.
+        */
+    }
+
+    @Test
+    public void t34() {
+        first.put("example", 3);
+        second.put("ejemplo", 5);
+        
+        second.updateValue("ejemplo", second.get("ejemplo") - 1);
+
+        double res = p.cosineVectorSimilarity(first, second);
+        
+        assertEquals(0.0, 0.0, 1e-15);
+
+        /*
+        Passes :D
+        */
+    }
+
+    @Test
+    public void t35() {
+        first.put("example", 3);
+        second.put("ejemplo", 5);
+        
+        second.updateValue("ejemplo", second.get("ejemplo") + 1);
+
+        double res = p.cosineVectorSimilarity(first, second);
+        
+        assertEquals(0.0, 0.0, 1e-15);
+
+        /*
+        Passes :D
+        */
+    }
+
+    // TOO LONG TO EXECUTE, NOT WORTH TESTING!!!!!
+    // @Test
+    // public void t36() {
+    //     String url2 = "https://en.wikipedia.org/wiki/4";
+
+    //     for(long i = 0; i < Integer.MAX_VALUE; i++) 
+    //         second.put(String.join("", Collections.nCopies((int)i+7, "b")), 1);
+
+    //     second.updateValue("bb", second.get("bb") - 1);
+
+    //     String[] arr2 = p.makeWordArray(url2);
+    //     ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //     p.populateTable(first, arr2, false);
+    //     p.populateTable(first, arrl2.toArray(new String[arrl2.size()]), true);
+
+    //     double res = p.cosineVectorSimilarity(first, second);
+    //     assertEquals(res, <SOME_OUTPUT>);
+    //     /*
+    //     Fails because comparing empty HashTable to populated one doesnt cause an error
+    //     */
+    // }
+
+    // @Test
+    // public void t37() {
+    //     String url2 = "https://en.wikipedia.org/wiki/4";
+
+    //     for(long i = 0; i < Integer.MAX_VALUE; i++) 
+    //         second.put(String.join("", Collections.nCopies((int)i+7, "b")), 1);
+
+    //     second.updateValue("bb", second.get("bb") + 1);
+
+    //     String[] arr2 = p.makeWordArray(url2);
+    //     ArrayList<String> arrl2 = p.makeMetaTagWords(url2);
+
+    //     p.populateTable(first, arr2, false);
+    //     p.populateTable(first, arrl2.toArray(new String[arrl2.size()]), true);
+
+    //     double res = p.cosineVectorSimilarity(first, second);
+    //     assertEquals(res, <SOME_OUTPUT>);
+    //     /*
+    //     Fails because comparing empty HashTable to populated one doesnt cause an error
+    //     */
+    // }
+
+    @Test
+    public void t38() {
+        second.put("lessThan0", -83);
+        String url = "https://en.wikipedia.org/wiki/3";
+        
+         String[] arr = p.makeWordArray(url);
+         ArrayList<String> arrl = p.makeMetaTagWords(url);
+ 
+        second.updateValue("lessThan0", second.get("lessThan0") - 1);
+
+         p.populateTable(first, arr, false);
+         p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+ 
+         double res = p.cosineVectorSimilarity(first, second);
+         assertTrue(false);
+
+        /*
+        No error thrown, negative occurences permitted by program,
+        both specification followed by the corresponding code must
+        be updated accordingly.
+        */
+    }
+
+    @Test
+    public void t39() {
+        second.put("lessThan0", -83);
+        String url = "https://en.wikipedia.org/wiki/3";
+        
+         String[] arr = p.makeWordArray(url);
+         ArrayList<String> arrl = p.makeMetaTagWords(url);
+ 
+        second.updateValue("lessThan0", second.get("lessThan0") + 1);
+
+         p.populateTable(first, arr, false);
+         p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+ 
+         double res = p.cosineVectorSimilarity(first, second);
+         assertTrue(false);
+
+        /*
+        No error thrown, negative occurences permitted by program,
+        both specification followed by the corresponding code must
+        be updated accordingly.
+        */
+    }
+
+    // LEADS TO COMPILATION ERROR: Test Passes!!!
+    // @Test
+    // public void t40() {
+    //     second.put("test", "two");
+    //     String url2 = "https://en.wikipedia.org/wiki/4";
+        
+    //      String[] arr = p.makeWordArray(url);
+    //      ArrayList<String> arrl = p.makeMetaTagWords(url);
+ 
+    //      second.updateValue("test", "twn");
+
+    //      p.populateTable(first, arr, false);
+    //      p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+    // LEADS TO COMPILATION ERROR: Test Passes!!!
+    // @Test
+    // public void t41() {
+    //     second.put("test", "two");
+    //     String url2 = "https://en.wikipedia.org/wiki/4";
+        
+    //      String[] arr = p.makeWordArray(url);
+    //      ArrayList<String> arrl = p.makeMetaTagWords(url);
+ 
+    //      second.updateValue("test", "twp");
+
+    //      p.populateTable(first, arr, false);
+    //      p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+   // LEADS TO COMPILATION ERROR: Test Passes!!!
+    // @Test
+    // public void t42() {
+    //     second.put("test2.2", 5.9);
+    //     String url2 = "https://en.wikipedia.org/wiki/6";
+        
+    //      String[] arr = p.makeWordArray(url);
+    //      ArrayList<String> arrl = p.makeMetaTagWords(url);
+
+    //      second.updateValue("test2.2", 5.89);
+ 
+    //      p.populateTable(first, arr, false);
+    //      p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
+
+   // LEADS TO COMPILATION ERROR: Test Passes!!!
+    // @Test
+    // public void t43() {
+    //     second.put("test2.2", 5.9);
+    //     String url2 = "https://en.wikipedia.org/wiki/6";
+        
+    //      String[] arr = p.makeWordArray(url);
+    //      ArrayList<String> arrl = p.makeMetaTagWords(url);
+ 
+    //      second.updateValue("test2.2", 5.91);
+
+    //      p.populateTable(first, arr, false);
+    //      p.populateTable(first, arrl.toArray(new String[arrl.size()]), true);
+ 
+    //      double res = p.cosineVectorSimilarity(first, second);
+    //      assertTrue(false);
+
+    //     /*
+    //     No error thrown, negative occurences permitted by program,
+    //     both specification followed by the corresponding code must
+    //     be updated accordingly.
+    //     */
+    // }
 }
